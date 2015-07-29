@@ -3,6 +3,7 @@ package com.eightpuzzle.game;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class EightPuzzleGenerator {
@@ -13,15 +14,15 @@ public class EightPuzzleGenerator {
 		rand = new Random();
 	}
 	
-	public static ArrayList<Integer> newPuzzle() {
-		ArrayList<Integer> newPuzzle = randSeq();
+	public static List<Integer> newPuzzle() {
+		List<Integer> newPuzzle = randSeq();
 		while (!isSolvable(newPuzzle))
 			newPuzzle = randSeq();
 		insertRandomZero(newPuzzle);
 		return newPuzzle;
 	}
 	
-	public static ArrayList<Integer> randSeq() {
+	public static List<Integer> randSeq() {
 		Integer[] seq = {1, 2, 3, 4, 5, 6, 7, 8};
 		Collections.shuffle(Arrays.asList(seq));
 		ArrayList<Integer> newSeq = new ArrayList<Integer>();
@@ -30,7 +31,7 @@ public class EightPuzzleGenerator {
 		return newSeq;
 	}
 	
-	public static boolean isSolvable(ArrayList<Integer> seq) {
+	public static boolean isSolvable(List<Integer> seq) {
 		int invCount = 0;
 		for (int i = 0; i < seq.size(); i++) {
 			for (int j = i+1; j < seq.size(); j++) {
@@ -41,7 +42,7 @@ public class EightPuzzleGenerator {
 		return invCount % 2 == 0;
 	}
 	
-	public static void insertRandomZero(ArrayList<Integer> seq) {
+	public static void insertRandomZero(List<Integer> seq) {
 		seq.add(rand.nextInt(9), 0);
 	}
 	
