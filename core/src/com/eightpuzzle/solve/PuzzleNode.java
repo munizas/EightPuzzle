@@ -1,5 +1,6 @@
 package com.eightpuzzle.solve;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -11,9 +12,19 @@ public class PuzzleNode {
 	private List<Integer> state;
 	private PuzzleNode parent;
 	private static Heuristic heuristic;
+	
+	public static List<Integer> GOAL;
+	
+	// used to help compute heuristic estimated cost
+	public static int[][] simGoal = {
+			{1, 2, 3},
+			{4, 5, 6},
+			{7, 8, 0}
+	};
 
 	static {
 		heuristic = ComputeH.MANHATTAN_DISTANCE;
+		GOAL = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 0));
 	}
 
 	public PuzzleNode(PuzzleNode parent, List<Integer> state) {
@@ -29,9 +40,17 @@ public class PuzzleNode {
 	public int getG() {
 		return g;
 	}
+	
+	public int getH() {
+		return h;
+	}
 
 	public int getF() {
 		return g + h;
+	}
+	
+	public List<Integer> getState() {
+		return state;
 	}
 
 	public List<PuzzleNode> getNextNodes() {
@@ -42,28 +61,32 @@ public class PuzzleNode {
 			List<Integer> newState = new ArrayList<Integer>(state);
 			newState.set(holeIndex, newState.get(holeIndex-3));
 			newState.set(holeIndex-3, 0);
-			nextNodes.add(new PuzzleNode(this, newState));
+			if (parent==null || !parent.getState().equals(newState))
+				nextNodes.add(new PuzzleNode(this, newState));
 		}
 		
 		if (holeIndex+3 < state.size()) {
 			List<Integer> newState = new ArrayList<Integer>(state);
 			newState.set(holeIndex, newState.get(holeIndex+3));
 			newState.set(holeIndex+3, 0);
-			nextNodes.add(new PuzzleNode(this, newState));
+			if (parent==null || !parent.getState().equals(newState))
+				nextNodes.add(new PuzzleNode(this, newState));
 		}
 		
 		if (holeIndex != 2 && holeIndex != 5 && holeIndex != 8) {
 			List<Integer> newState = new ArrayList<Integer>(state);
 			newState.set(holeIndex, newState.get(holeIndex+1));
 			newState.set(holeIndex+1, 0);
-			nextNodes.add(new PuzzleNode(this, newState));
+			if (parent==null || !parent.getState().equals(newState))
+				nextNodes.add(new PuzzleNode(this, newState));
 		}
 		
 		if (holeIndex != 3 && holeIndex != 6 && holeIndex != 0) {
 			List<Integer> newState = new ArrayList<Integer>(state);
 			newState.set(holeIndex, newState.get(holeIndex-1));
 			newState.set(holeIndex-1, 0);
-			nextNodes.add(new PuzzleNode(this, newState));
+			if (parent==null || !parent.getState().equals(newState))
+				nextNodes.add(new PuzzleNode(this, newState));
 		}
 		
 		return nextNodes;
