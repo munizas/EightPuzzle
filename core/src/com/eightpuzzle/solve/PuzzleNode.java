@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import com.eightpuzzle.heuristic.ComputeH;
 import com.eightpuzzle.heuristic.Heuristic;
 
-public class PuzzleNode {
+public class PuzzleNode implements Comparable<PuzzleNode> {
 	private int g, h;
 	private List<Integer> state;
 	private PuzzleNode parent;
@@ -52,6 +52,10 @@ public class PuzzleNode {
 	public List<Integer> getState() {
 		return state;
 	}
+	
+	public PuzzleNode getParent() {
+		return parent;
+	}
 
 	public List<PuzzleNode> getNextNodes() {
 		List<PuzzleNode> nextNodes = new ArrayList<PuzzleNode>();
@@ -94,5 +98,10 @@ public class PuzzleNode {
 	
 	public String toString() {
 		return "g=" + g + ", h=" + h + ", state: " + state.toString();
+	}
+
+	@Override
+	public int compareTo(PuzzleNode o) {
+		return getF() - o.getF();
 	}
 }
