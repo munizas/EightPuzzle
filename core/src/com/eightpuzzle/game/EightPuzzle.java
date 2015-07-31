@@ -19,6 +19,7 @@ package com.eightpuzzle.game;
  ******************************************************************************/
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +51,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.eightpuzzle.solve.EightPuzzleSolver;
+import com.eightpuzzle.solve.PuzzleNode;
 
 public class EightPuzzle implements ApplicationListener {
 	Skin skin;
@@ -310,7 +314,20 @@ public class EightPuzzle implements ApplicationListener {
 	public class MySolveListener extends ClickListener {
 		@Override
 		public void clicked(InputEvent a, float x, float y) {
-			map.get(1).toggle();
+			Deque<List<Integer>> solutionStack = EightPuzzleSolver.solve(new PuzzleNode(null, state));
+			int delaySec = 1;
+			while (!solutionStack.isEmpty()) {
+				final List<Integer> nextMove = solutionStack.removeFirst();
+				Timer.Task t = new Timer.Task() {
+					
+					@Override
+					public void run() {
+						state = nextMove;
+						updateTable();
+					}
+				};
+				new Timer().scheduleTask(t, delaySec++);
+			}
 		}
 	}
 	
