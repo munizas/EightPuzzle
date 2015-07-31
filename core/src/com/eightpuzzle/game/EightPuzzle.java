@@ -39,6 +39,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
@@ -60,9 +61,11 @@ public class EightPuzzle implements ApplicationListener {
 	Skin skin;
 	Stage stage;
 	final Table table = new Table();
+	private ImageTextButton newGameB;
+	private ImageTextButton solveB;
 
 	@Override
-	public void create () {
+	public void create() {
 		stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		Gdx.input.setInputProcessor(stage);
 
@@ -221,10 +224,10 @@ public class EightPuzzle implements ApplicationListener {
 		map.put(7, b8);
 		map.put(8, b9);
 
-		ImageTextButton newGameB = new ImageTextButton("New Game", skin);
+		newGameB = new ImageTextButton("New Game", skin);
 		newGameB.addListener(new NewGameListener());
 
-		ImageTextButton solveB = new ImageTextButton("Solve", skin);
+		solveB = new ImageTextButton("Solve", skin);
 		solveB.addListener(new MySolveListener());
 		
 		newGameBoard();
@@ -314,6 +317,8 @@ public class EightPuzzle implements ApplicationListener {
 	public class MySolveListener extends ClickListener {
 		@Override
 		public void clicked(InputEvent a, float x, float y) {
+			newGameB.setTouchable(Touchable.disabled);
+			solveB.setTouchable(Touchable.disabled);
 			Deque<List<Integer>> solutionStack = EightPuzzleSolver.solve(new PuzzleNode(null, state));
 			int delaySec = 1;
 			while (!solutionStack.isEmpty()) {
@@ -323,6 +328,11 @@ public class EightPuzzle implements ApplicationListener {
 					@Override
 					public void run() {
 						state = nextMove;
+						if (state.equals(PuzzleNode.GOAL)) {
+							solveB.setTouchable(Touchable.enabled);
+							newGameB.setTouchable(Touchable.enabled);
+							holeIndex = 8;
+						}
 						updateTable();
 					}
 				};
