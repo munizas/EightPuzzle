@@ -29,6 +29,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -63,10 +64,17 @@ public class EightPuzzle implements ApplicationListener {
 	final Table table = new Table();
 	private ImageTextButton newGameB;
 	private ImageTextButton solveB;
+	private final int GAME_WIDTH = 480;//1920;
+	private final int GAME_HEIGHT = 800;//1200;
 
 	@Override
 	public void create() {
-		stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		float aspectRatio = (float)Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth();
+		OrthographicCamera camera = new OrthographicCamera(GAME_WIDTH * aspectRatio, GAME_HEIGHT * aspectRatio);
+		//camera.position.set(GAME_WIDTH/2, GAME_HEIGHT/2, 0)
+		camera.setToOrtho(false, GAME_WIDTH * aspectRatio, GAME_HEIGHT * aspectRatio);
+		//camera.setToOrtho(false,GAME_WIDTH,GAME_HEIGHT);
+		stage = new Stage(new ExtendViewport(GAME_WIDTH * aspectRatio, GAME_HEIGHT * aspectRatio, camera));//Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera));
 		Gdx.input.setInputProcessor(stage);
 
 		// A skin can be loaded via JSON or defined programmatically, either is fine. Using a skin is optional but strongly
@@ -100,7 +108,7 @@ public class EightPuzzle implements ApplicationListener {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Zig.ttf"));
 
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = 50;
+		parameter.size = 25;
 
 		BitmapFont gameFont = generator.generateFont(parameter);
 		generator.dispose();
@@ -232,11 +240,11 @@ public class EightPuzzle implements ApplicationListener {
 		
 		newGameBoard();
 		
-		table.padTop(50);
-		table.padBottom(20);
+		//table.padTop(50);
+		//table.padBottom(20);
 		
 		VerticalGroup vg = new VerticalGroup();
-		vg.padTop(50);
+		//vg.padTop(50);
 		vg.setFillParent(true);
 		vg.addActor(new Label("Moves", skin));
 		vg.addActor(newGameB);
