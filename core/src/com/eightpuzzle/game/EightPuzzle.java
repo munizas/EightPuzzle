@@ -34,6 +34,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
@@ -50,6 +51,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -66,10 +69,18 @@ public class EightPuzzle implements ApplicationListener {
 	private ImageTextButton solveB;
 	private final int GAME_WIDTH = 480;//1920;
 	private final int GAME_HEIGHT = 800;//1200;
+	private float aspectRatio;
+	private SpriteBatch batch;
+	private boolean isSolved;
+	private BitmapFont gameFont;
+	private BitmapFont solvedFont;
 
 	@Override
 	public void create() {
-		float aspectRatio = (float)Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth();
+		gameFont = new BitmapFont();
+		solvedFont = new BitmapFont();
+		batch = new SpriteBatch();
+		aspectRatio = (float)Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth();
 		OrthographicCamera camera = new OrthographicCamera(GAME_WIDTH * aspectRatio, GAME_HEIGHT * aspectRatio);
 		//camera.position.set(GAME_WIDTH/2, GAME_HEIGHT/2, 0)
 		camera.setToOrtho(false, GAME_WIDTH * aspectRatio, GAME_HEIGHT * aspectRatio);
@@ -104,13 +115,21 @@ public class EightPuzzle implements ApplicationListener {
 		//labelSty.fontColor = Color.GREEN;
 		skin.add("default", labelSty);
 		
+		WindowStyle ws = new Window.WindowStyle();
+		ws.titleFont = new BitmapFont();
+		ws.background = skin.newDrawable("white", Color.BLACK);
+		skin.add("default", ws);
 		
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Zig.ttf"));
 
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = 25;
-
-		BitmapFont gameFont = generator.generateFont(parameter);
+		gameFont = generator.generateFont(parameter);
+		
+		FreeTypeFontParameter parameter2 = new FreeTypeFontParameter();
+		parameter2.size = 100;
+		parameter2.color = Color.GREEN;
+		solvedFont = generator.generateFont(parameter2);
 		generator.dispose();
 		
 		FileHandle blue, n1, n2, n3, n4, n5, n6, n7, n8, solveUp, solveDown;
@@ -246,7 +265,6 @@ public class EightPuzzle implements ApplicationListener {
 		VerticalGroup vg = new VerticalGroup();
 		//vg.padTop(50);
 		vg.setFillParent(true);
-		vg.addActor(new Label("Moves", skin));
 		vg.addActor(newGameB);
 		vg.addActor(table);
 		vg.addActor(solveB);
@@ -261,6 +279,11 @@ public class EightPuzzle implements ApplicationListener {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		stage.draw();
+		if (isSolved) {
+			batch.begin();
+			solvedFont.draw(batch, "Solved!", GAME_WIDTH*aspectRatio/2 - (GAME_WIDTH*aspectRatio/4), GAME_HEIGHT*aspectRatio/(float)1.7);
+			batch.end();
+		}
 	}
 	
 	private void newGameBoard() {
@@ -276,6 +299,7 @@ public class EightPuzzle implements ApplicationListener {
 			table.add(map.get(state.get(i+2)));
 			table.row().fillX();
 		}
+		isSolved = state.equals(PuzzleNode.GOAL);
 	}
 	
 	@Override
